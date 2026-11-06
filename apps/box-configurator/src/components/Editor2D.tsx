@@ -882,6 +882,7 @@ export const Editor2D = observer(() => {
 
         {/* Bottom Toolbar for 2D Layout Controls */}
         <div
+          className="floating-toolbar"
           style={{
             position: 'absolute',
             bottom: '16px',
