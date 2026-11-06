@@ -648,6 +648,7 @@ export const Editor2D = observer(() => {
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
   const prevWidthRef = useRef(0);
   const stageScaleRef = useRef(stageScale);
+  const lastPinchDistRef = useRef(0);
 
   useEffect(() => {
     stageScaleRef.current = stageScale;
@@ -732,6 +733,36 @@ export const Editor2D = observer(() => {
       x: -(mousePointTo.x - stage.getPointerPosition().x / newScale) * newScale,
       y: -(mousePointTo.y - stage.getPointerPosition().y / newScale) * newScale,
     });
+  };
+
+  const handlePinchMove = (e: Event) => {
+    const t1 = e.evt.touches[0];
+    const t2 = e.evt.touches[1];
+    const stage = stageRef.current;
+    if (!t1 || !t2 || !stage) return;
+    e.evt.preventDefault();
+    stage.stopDrag();
+    const dist = Math.hypot(t2.clientX - t1.clientX, t2.clientY - t1.clientY);
+    if (lastPinchDistRef.current) {
+      const rect = stage.container().getBoundingClientRect();
+      const mid = { x: (t1.clientX + t2.clientX) / 2 - rect.left, y: (t1.clientY + t2.clientY) / 2 - rect.top };
+      const oldScale = stage.scaleX();
+      const pointTo = {
+        x: mid.x / oldScale - stage.x() / oldScale,
+        y: mid.y / oldScale - stage.y() / oldScale,
+      };
+      const newScale = oldScale * dist / lastPinchDistRef.current;
+      setStageScale(newScale);
+      setStagePos({
+        x: -(pointTo.x - mid.x / newScale) * newScale,
+        y: -(pointTo.y - mid.y / newScale) * newScale,
+      });
+    }
+    lastPinchDistRef.current = dist;
+  };
+
+  const handlePinchEnd = () => {
+    lastPinchDistRef.current = 0;
   };
 
   const addText = () => {
@@ -831,6 +862,8 @@ export const Editor2D = observer(() => {
             ref={stageRef}
             onMouseDown={checkDeselect}
             onTouchStart={checkDeselect}
+            onTouchMove={handlePinchMove}
+            onTouchEnd={handlePinchEnd}
             draggable
             onDragEnd={(e) => {
               if (e.target === e.target.getStage()) {
