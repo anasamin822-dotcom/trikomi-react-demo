@@ -870,7 +870,7 @@ button.primary-btn:hover {
   }
 
   .editor-2d-container .header {
-    padding: 12px 12px 12px 68px !important;
+    padding: 56px 12px 12px 68px !important;
     flex-wrap: wrap;
     row-gap: 8px;
   }
