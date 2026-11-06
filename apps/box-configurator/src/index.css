@@ -65,6 +65,7 @@ body {
   flex: 1;
   flex-direction: row;
   height: 100vh;
+  height: 100dvh;
   position: relative;
   overflow: hidden;
 }
