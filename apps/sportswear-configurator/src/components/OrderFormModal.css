@@ -87,6 +87,7 @@
   padding: 10px 18px;
   border-radius: var(--radius-sm, 8px);
   font-weight: 600;
+  white-space: nowrap;
   cursor: pointer;
   box-shadow: 0 4px 14px rgba(99, 102, 241, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.35), inset 0 -2px 0 rgba(0, 0, 0, 0.25);
   transition: all 0.15s ease;
@@ -100,7 +101,6 @@
   background: currentColor;
   -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4'/%3E%3Cpolyline points='7 10 12 15 17 10'/%3E%3Cline x1='12' y1='15' x2='12' y2='3'/%3E%3C/svg%3E") center / contain no-repeat;
   mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4'/%3E%3Cpolyline points='7 10 12 15 17 10'/%3E%3Cline x1='12' y1='15' x2='12' y2='3'/%3E%3C/svg%3E") center / contain no-repeat;
-  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.3));
 }
 
 .btn-print:hover {
@@ -426,9 +426,24 @@
   .btn-print, .btn-close {
     display: none;
   }
+  
+  .order-form-header {
+    background: #fff !important;
+    box-shadow: none;
+  }
+  
+  .order-form-header > div:first-child::before {
+    display: none;
+  }
+  
+  .order-form-header h2 {
+    background: none;
+    color: #000 !important;
+    -webkit-text-fill-color: #000;
+  }
 }
 
-/* ---- Mobile: stacked layout, fits 390px (screen only; print/PDF keeps A4) ---- */
+/* ---- MOBILE: STACKED LAYOUT ---- */
 @media screen and (max-width: 768px) {
   .order-form-overlay {
     padding: 0;
@@ -461,18 +476,14 @@
   .order-form-content {
     padding: 16px;
     gap: 20px;
-    overflow-x: hidden;
   }
 
-  /* A4 becomes a fluid card on phones */
   .tech-pack-a4 {
     width: 100%;
     min-height: auto;
     padding: 16px;
-    margin: 0;
   }
 
-  /* Brand block stacks above meta */
   .tp-header {
     flex-direction: column;
     align-items: flex-start;
@@ -492,13 +503,11 @@
     justify-content: flex-start;
   }
 
-  /* 4 renders become 2x2 so BACK/LEFT/RIGHT are all visible */
   .tp-renders-grid {
     grid-template-columns: repeat(2, 1fr);
     gap: 10px;
   }
 
-  /* Material Spec stacks above Color Breakdown */
   .tp-row {
     flex-direction: column;
     gap: 20px;
@@ -508,30 +517,11 @@
     grid-template-columns: 1fr;
   }
 
-  /* Graphics list single column */
   .tp-assets-list {
     grid-template-columns: 1fr;
   }
 
   .tp-section {
     margin-bottom: 20px;
-  }
-}
-
-/* Print: keep header clean on paper (PDF export draws only #TechPackExport) */
-@media print {
-  .order-form-header {
-    background: #fff !important;
-    box-shadow: none;
-  }
-
-  .order-form-header > div:first-child::before {
-    display: none;
-  }
-
-  .order-form-header h2 {
-    background: none;
-    color: #000 !important;
-    -webkit-text-fill-color: #000;
   }
 }
