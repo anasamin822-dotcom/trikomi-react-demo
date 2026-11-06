@@ -884,6 +884,13 @@ button.primary-btn:hover {
     width: 100%;
   }
 
+  .floating-toolbar {
+    max-width: 96%;
+    flex-wrap: wrap;
+    justify-content: center;
+    row-gap: 4px;
+  }
+
   .view-switcher-container {
     top: 10px;
     right: 10px;
