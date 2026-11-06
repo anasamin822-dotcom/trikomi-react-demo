@@ -14,12 +14,12 @@
 }
 
 .order-form-modal {
-  background: var(--color-bg);
+  background: var(--color-bg, #111827);
   width: 100%;
   max-width: 1000px;
   max-height: 90vh;
-  border-radius: var(--radius-lg);
-  border: 1px solid var(--color-panel-border);
+  border-radius: var(--radius-lg, 16px);
+  border: 1px solid var(--color-panel-border, rgba(255,255,255,0.12));
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
   display: flex;
   flex-direction: column;
@@ -28,22 +28,22 @@
 
 .order-form-header {
   padding: 24px 32px;
-  border-bottom: 1px solid var(--color-panel-border);
+  border-bottom: 1px solid var(--color-panel-border, rgba(255,255,255,0.12));
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: var(--color-panel);
+  background: var(--color-panel, #1f2937);
 }
 
 .order-form-header h2 {
-  font-family: var(--font-title);
+  font-family: var(--font-title, inherit);
   margin: 0;
   font-size: 1.5rem;
   color: #fff;
 }
 
 .order-form-header .subtitle {
-  color: var(--color-text-secondary);
+  color: var(--color-text-secondary, #9ca3af);
   font-size: 0.9rem;
   margin-top: 4px;
 }
@@ -54,18 +54,18 @@
 }
 
 .btn-print {
-  background: var(--color-accent);
+  background: var(--color-accent, #6366f1);
   color: white;
   border: none;
   padding: 8px 16px;
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-sm, 8px);
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
 }
 
 .btn-print:hover {
-  background: var(--color-accent-hover);
+  background: var(--color-accent-hover, #4f46e5);
 }
 
 .btn-close {
@@ -377,5 +377,90 @@
   
   .btn-print, .btn-close {
     display: none;
+  }
+}
+
+/* ---- Mobile: stacked layout, fits 390px (screen only; print/PDF keeps A4) ---- */
+@media screen and (max-width: 768px) {
+  .order-form-overlay {
+    padding: 0;
+    align-items: stretch;
+  }
+
+  .order-form-modal {
+    max-height: 100dvh;
+    border-radius: 0;
+    border: none;
+  }
+
+  .order-form-header {
+    padding: 14px 16px;
+  }
+
+  .order-form-header h2 {
+    font-size: 1.1rem;
+  }
+
+  .order-form-header .subtitle {
+    font-size: 0.75rem;
+  }
+
+  .order-form-content {
+    padding: 16px;
+    gap: 20px;
+    overflow-x: hidden;
+  }
+
+  /* A4 becomes a fluid card on phones */
+  .tech-pack-a4 {
+    width: 100%;
+    min-height: auto;
+    padding: 16px;
+    margin: 0;
+  }
+
+  /* Brand block stacks above meta */
+  .tp-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+
+  .tp-brand h1 {
+    font-size: 18px;
+  }
+
+  .tp-meta {
+    text-align: left;
+  }
+
+  .tp-meta-item {
+    justify-content: flex-start;
+  }
+
+  /* 4 renders become 2x2 so BACK/LEFT/RIGHT are all visible */
+  .tp-renders-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+
+  /* Material Spec stacks above Color Breakdown */
+  .tp-row {
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .tp-colors-grid {
+    grid-template-columns: 1fr;
+  }
+
+  /* Graphics list single column */
+  .tp-assets-list {
+    grid-template-columns: 1fr;
+  }
+
+  .tp-section {
+    margin-bottom: 20px;
   }
 }
