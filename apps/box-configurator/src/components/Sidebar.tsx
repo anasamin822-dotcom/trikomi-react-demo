@@ -6,7 +6,7 @@ import { AppearanceTab } from './tabs/AppearanceTab';
 import { RenderTab } from './tabs/RenderTab';
 
 export const Sidebar = observer(() => {
-  const [isControlsOpen, setIsControlsOpen] = useState(() => window.innerWidth > 768);
+  const [isControlsOpen, setIsControlsOpen] = useState(window.innerWidth > 768);
   const [activeTab, setActiveTab] = useState<'structure' | 'appearance' | 'render'>('structure');
 
   // Dispatch window resize event at the end of the sidebar transition to recalculate canvas widths smoothly
