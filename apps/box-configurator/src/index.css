@@ -883,6 +883,7 @@ button.primary-btn:hover {
 
   .editor-2d-container .header > div {
     width: 100%;
+    flex-wrap: wrap;
   }
 
   .floating-toolbar {
