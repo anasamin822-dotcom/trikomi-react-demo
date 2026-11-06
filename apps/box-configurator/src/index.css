@@ -462,6 +462,7 @@ input[type="number"] {
 .angle-row-name {
   font-weight: 500;
   color: var(--color-text-main);
+  flex-shrink: 0;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -483,7 +484,7 @@ input[type="number"] {
   border-radius: 4px;
 }
 .angle-row-input-group input {
-  width: 40px;
+  width: 34px;
   background: transparent;
   border: none;
   color: white;
