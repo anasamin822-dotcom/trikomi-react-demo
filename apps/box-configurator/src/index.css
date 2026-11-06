@@ -467,6 +467,7 @@ input[type="number"] {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  max-width: 120px;
 }
 
 .angle-row-inputs {
@@ -485,7 +486,7 @@ input[type="number"] {
   border-radius: 4px;
 }
 .angle-row-input-group input {
-  width: 34px;
+  width: 40px;
   background: transparent;
   border: none;
   color: white;
@@ -876,16 +877,11 @@ button.primary-btn:hover {
     row-gap: 8px;
   }
 
-  .editor-2d-container .header h2 {
-    display: none;
-  }
-
   .editor-2d-container .header > div {
     width: 100%;
   }
 
   .floating-toolbar {
-    width: max-content;
     max-width: 96%;
     flex-wrap: wrap;
     justify-content: center;
@@ -897,9 +893,6 @@ button.primary-btn:hover {
     right: 10px;
   }
 
-  .view-switcher-btn {
-    padding: 6px 8px;
-  }
 }
 
 
