@@ -877,11 +877,16 @@ button.primary-btn:hover {
     row-gap: 8px;
   }
 
+  .editor-2d-container .header h2 {
+    display: none;
+  }
+
   .editor-2d-container .header > div {
     width: 100%;
   }
 
   .floating-toolbar {
+    width: max-content;
     max-width: 96%;
     flex-wrap: wrap;
     justify-content: center;
