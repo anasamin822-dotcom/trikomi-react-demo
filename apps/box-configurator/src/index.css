@@ -885,6 +885,7 @@ button.primary-btn:hover {
   }
 
   .floating-toolbar {
+    width: max-content;
     max-width: 96%;
     flex-wrap: wrap;
     justify-content: center;
