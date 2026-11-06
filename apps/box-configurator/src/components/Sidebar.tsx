@@ -27,6 +27,7 @@ export const Sidebar = observer(() => {
   useEffect(() => {
     if (configStore.selectedDesignElementId) {
       setActiveTab('appearance');
+      if (window.innerWidth <= 768) setIsControlsOpen(true);
     }
   }, [configStore.selectedDesignElementId]);
 
