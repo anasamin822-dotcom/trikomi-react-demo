@@ -24,7 +24,7 @@ const serveSecurityTxtPlugin = () => ({
 export default defineConfig(({ command }) => {
   const isDev = command === 'serve';
   const localCoreEntry = path.resolve(__dirname, '../../../trikomi/packages/core/src/index.ts');
-  const useLocalSdk = isDev ? fs.existsSync(localCoreEntry) : (process.env.USE_LOCAL_SDK === 'true');
+  const useLocalSdk = isDev && (fs.existsSync(localCoreEntry) || process.env.USE_LOCAL_SDK === 'true');
   const dynamicAlias = useLocalSdk ? {
     '@trikomi/core/8thwall': path.resolve(__dirname, '../../../trikomi/packages/8thwall/src/index.ts'),
     '@trikomi/core/sportswear': path.resolve(__dirname, '../../../trikomi/packages/sportswear/src/index.ts'),

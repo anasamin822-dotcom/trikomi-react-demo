@@ -29,7 +29,7 @@ export default defineConfig(({ command }) => {
   const isDev = command === 'serve';
   const localSdkRoot = path.resolve(__dirname, '../../../trikomi/packages');
   const localSportswearEntry = path.resolve(localSdkRoot, 'sportswear/src/index.ts');
-  const useLocalSdk = isDev ? fs.existsSync(localSportswearEntry) : (process.env.USE_LOCAL_SDK === 'true');
+  const useLocalSdk = isDev && (fs.existsSync(localSportswearEntry) || process.env.USE_LOCAL_SDK === 'true');
   const dynamicAlias = useLocalSdk ? {
     '@trikomi/core/8thwall': path.resolve(localSdkRoot, '8thwall/src/index.ts'),
     '@trikomi/core/sportswear': localSportswearEntry,

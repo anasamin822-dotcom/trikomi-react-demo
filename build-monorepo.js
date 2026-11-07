@@ -22,10 +22,9 @@ if (fs.existsSync(envPath)) {
 }
 import crypto from 'crypto';
 
-// Build command MUST use npm package unless explicitly overridden via CLI (e.g. BUILD_LOCAL_SDK=true)
-const forceLocalSdk = process.env.BUILD_LOCAL_SDK === 'true';
-process.env.USE_LOCAL_SDK = forceLocalSdk ? 'true' : 'false';
-console.log(`📦 Build Mode: Using ${forceLocalSdk ? 'Local SDK' : 'Staged NPM Package (@trikomi/core)'}\n`);
+// Trikomi Demo build MUST strictly use the NPM package (@trikomi/core from npm-staging)
+process.env.USE_LOCAL_SDK = 'false';
+console.log('📦 Build Mode: Strictly using Staged NPM Package (@trikomi/core)\n');
 
 const appsDir = path.resolve('apps');
 const apps = fs.readdirSync(appsDir).filter(name => fs.statSync(path.join(appsDir, name)).isDirectory());
@@ -38,33 +37,8 @@ if (fs.existsSync(rootDist)) {
 fs.mkdirSync(rootDist, { recursive: true });
 fs.mkdirSync(path.join(rootDist, 'assets'), { recursive: true });
 
-console.log('Building all packages first...\n');
-const packagesDir = path.resolve('packages');
-if (fs.existsSync(packagesDir)) {
-  const packages = fs.readdirSync(packagesDir).filter(name => fs.statSync(path.join(packagesDir, name)).isDirectory());
-  // Ensure core is built first if it hasn't been
-  if (packages.includes('core')) {
-    try {
-      execSync(`pnpm --dir packages/core build`, { stdio: 'inherit' });
-    } catch (err) {
-      console.error(`Failed to build core. Skipping...`);
-    }
-  }
-  for (const pkg of packages) {
-    if (pkg === 'core') continue;
-    console.log(`================================`);
-    console.log(`Building package ${pkg}...`);
-    console.log(`================================`);
-    try {
-      execSync(`pnpm --dir packages/${pkg} build`, { stdio: 'inherit' });
-    } catch (err) {
-      console.error(`Failed to build package ${pkg}. Skipping...`);
-      continue;
-    }
-  }
-}
-
 console.log('Building all apps to a single shared dist folder...\n');
+const failedApps = [];
 for (const app of apps) {
   console.log(`================================`);
   console.log(`Building ${app}...`);
@@ -78,6 +52,7 @@ for (const app of apps) {
     });
   } catch (err) {
     console.error(`Failed to build ${app}. Skipping...`);
+    failedApps.push(app);
     continue;
   }
 
@@ -178,6 +153,11 @@ if (fs.existsSync(docsDir)) {
 }
 
 // Monorepo Integrity Signature removed as requested
+
+if (failedApps.length > 0) {
+  console.error(`\n❌ Monorepo build failed for apps: ${failedApps.join(', ')}`);
+  process.exit(1);
+}
 
 console.log('✅ Monorepo build complete! All apps are in the ./dist directory sharing a single ./dist/assets folder.');
 console.log('Note: To serve this locally, run `npx serve dist` from the project root.');

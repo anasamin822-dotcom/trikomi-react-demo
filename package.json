@@ -9,7 +9,6 @@
     "dev:sdk": "USE_LOCAL_SDK=true vite",
     "serve": "serve dist -p 3000",
     "build": "node build-monorepo.js",
-    "build:sdk": "USE_LOCAL_SDK=true node build-monorepo.js",
     "build:viewer": "pnpm --filter @trikomi/app-viewer build",
     "preview:viewer": "pnpm --filter @trikomi/app-viewer preview",
     "build:eyewear": "pnpm --filter @trikomi/eyewear-tryon build",
