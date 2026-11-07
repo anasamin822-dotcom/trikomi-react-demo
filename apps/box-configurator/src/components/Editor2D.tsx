@@ -673,8 +673,19 @@ export const Editor2D = observer(() => {
       }
     };
     handleResize();
+
+    const resizeObserver = new ResizeObserver(() => {
+      handleResize();
+    });
+    if (containerRef.current) {
+      resizeObserver.observe(containerRef.current);
+    }
+
     window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    return () => {
+      resizeObserver.disconnect();
+      window.removeEventListener('resize', handleResize);
+    };
   }, []);
 
   const updateTexture = () => {
@@ -1035,44 +1046,38 @@ export const Editor2D = observer(() => {
           </select>
         </div>
 
-        {/* HTML Context Menu Overlay for Adding Attachments */}
+        {/* HTML Context Menu Overlay for Adding Attachments (Pure CSS Anchor Auto-Positioning) */}
         {addMenuOverlay && (
-          <div
-            style={{
-              position: 'absolute',
-              left: addMenuOverlay.x,
-              top: addMenuOverlay.y,
-              background: '#2d3748',
-              border: '1px solid #4a5568',
-              borderRadius: '8px',
-              padding: '8px',
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '4px',
-              boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
-              zIndex: 10,
-              transform: 'translate(-50%, -100%)', // Center above the click point
-              marginTop: '-16px'
-            }}
-          >
-            <div style={{ fontSize: '0.8rem', color: '#a0aec0', marginBottom: '4px', textAlign: 'center', fontWeight: 'bold' }}>Add to {addMenuOverlay.edge}</div>
-            <button
-              style={{ background: '#4a5568', color: 'white', border: 'none', padding: '6px 12px', borderRadius: '4px', cursor: 'pointer', fontSize: '0.9rem' }}
-              onClick={() => { configStore.addAttachment(addMenuOverlay.nodeId, addMenuOverlay.edge, 'panel'); setAddMenuOverlay(null); }}
-            >+ Add Panel</button>
-            <button
-              style={{ background: '#4a5568', color: 'white', border: 'none', padding: '6px 12px', borderRadius: '4px', cursor: 'pointer', fontSize: '0.9rem' }}
-              onClick={() => { configStore.addAttachment(addMenuOverlay.nodeId, addMenuOverlay.edge, 'flap'); setAddMenuOverlay(null); }}
-            >+ Add Flap</button>
-            <button
-              style={{ background: '#4a5568', color: 'white', border: 'none', padding: '6px 12px', borderRadius: '4px', cursor: 'pointer', fontSize: '0.9rem' }}
-              onClick={() => { configStore.addAttachment(addMenuOverlay.nodeId, addMenuOverlay.edge, 'tuck'); setAddMenuOverlay(null); }}
-            >+ Add Tuck</button>
-            <button
-              style={{ background: 'transparent', color: '#fc8181', border: 'none', padding: '4px 12px', borderRadius: '4px', cursor: 'pointer', fontSize: '0.8rem', marginTop: '4px' }}
-              onClick={() => setAddMenuOverlay(null)}
-            >Cancel</button>
-          </div>
+          <>
+            {/* Zero-size anchor pin positioned at canvas click coordinates */}
+            <div
+              className="flap-anchor-pin"
+              style={{ left: addMenuOverlay.x, top: addMenuOverlay.y }}
+            />
+
+            {/* Popup positioned purely by browser CSS engine */}
+            <div className="flap-popup-menu">
+              <div style={{ fontSize: '0.8rem', color: '#a0aec0', marginBottom: '4px', textAlign: 'center', fontWeight: 'bold' }}>
+                Add to {addMenuOverlay.edge}
+              </div>
+              <button
+                style={{ background: '#4a5568', color: 'white', border: 'none', padding: '6px 12px', borderRadius: '4px', cursor: 'pointer', fontSize: '0.9rem' }}
+                onClick={() => { configStore.addAttachment(addMenuOverlay.nodeId, addMenuOverlay.edge, 'panel'); setAddMenuOverlay(null); }}
+              >+ Add Panel</button>
+              <button
+                style={{ background: '#4a5568', color: 'white', border: 'none', padding: '6px 12px', borderRadius: '4px', cursor: 'pointer', fontSize: '0.9rem' }}
+                onClick={() => { configStore.addAttachment(addMenuOverlay.nodeId, addMenuOverlay.edge, 'flap'); setAddMenuOverlay(null); }}
+              >+ Add Flap</button>
+              <button
+                style={{ background: '#4a5568', color: 'white', border: 'none', padding: '6px 12px', borderRadius: '4px', cursor: 'pointer', fontSize: '0.9rem' }}
+                onClick={() => { configStore.addAttachment(addMenuOverlay.nodeId, addMenuOverlay.edge, 'tuck'); setAddMenuOverlay(null); }}
+              >+ Add Tuck</button>
+              <button
+                style={{ background: 'transparent', color: '#fc8181', border: 'none', padding: '4px 12px', borderRadius: '4px', cursor: 'pointer', fontSize: '0.8rem', marginTop: '4px' }}
+                onClick={() => setAddMenuOverlay(null)}
+              >Cancel</button>
+            </div>
+          </>
         )}
 
         {/* Hidden Export Stage (Dynamic Bounds Size) */}

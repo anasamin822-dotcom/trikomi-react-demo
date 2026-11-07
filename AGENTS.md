@@ -30,3 +30,9 @@ Whenever core engine code (`packages/core/src` in `3dviewer`) is updated:
 3. Propagate the new tarball to `3dviewer-demo/npm-staging/`, update package dependencies in `3dviewer-demo`, and run `pnpm install`.
 4. Update `victorshell2/client` dependencies with the new tarball and run `pnpm install`.
 5. Verify builds across all repos to ensure full ecosystem compatibility and zero runtime regressions.
+
+## 6. Strict Git Control: No Staging, Commits, or Pushes by Agent
+- **STRICT PROHIBITION ON GIT ACTIONS**: The agent is **NEVER** allowed to run `git add`, `git stage`, `git commit`, `git push`, or alter git index / history / remote state.
+- **NO STAGING**: The agent must **NEVER** stage files (`git add` is strictly prohibited).
+- **FILE MODIFICATIONS ONLY**: The agent is strictly permitted only to create, edit, and test files locally in the working directory.
+- All git operations (staging with `git add`, committing with `git commit`, and pushing with `git push`) are reserved exclusively for the user.

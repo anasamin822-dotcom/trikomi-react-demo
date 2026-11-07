@@ -297,7 +297,17 @@ export const ThreeCanvas = observer(({ }: {}) => {
     viewer.camera.position.set(3, 3, 5);
     viewer.camera.lookAt(0, 0, 0);
 
+    const resizeObserver = new ResizeObserver(() => {
+      if (viewer && typeof viewer.handleResize === 'function') {
+        viewer.handleResize();
+      }
+    });
+    if (containerRef.current) {
+      resizeObserver.observe(containerRef.current);
+    }
+
     return () => {
+      resizeObserver.disconnect();
       if (window.__THREE_VIEWER_INSTANCE__ === viewer) {
         window.__THREE_VIEWER_INSTANCE__ = undefined;
       }
