@@ -529,3 +529,15 @@ body {
 .ar-back-btn:active {
   transform: translateY(0) scale(0.96);
 }
+
+
+/* Keep the timeline above the bottom toolbar on small screens */
+.animation-timeline {
+  bottom: 83px;
+}
+
+@media (max-width: 768px), (max-height: 480px) {
+  .animation-timeline {
+    bottom: 145px;
+  }
+}
