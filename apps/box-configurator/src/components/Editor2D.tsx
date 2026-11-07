@@ -1,5 +1,5 @@
 import { drawUniversalHole, _PathAdapter, DESIGN_SCALE, _DESIGN_CENTER_X, _DESIGN_CENTER_Y, _DESIGN_WIDTH, _DESIGN_HEIGHT, getPatternCanvasCached, getClockwisePath } from '@trikomi/core/box';
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useLayoutEffect, useRef } from 'react';
 import { Stage, Layer, Rect, Transformer, Line, Text, Group, Circle, Image, Shape } from 'react-konva';
 import { observer } from 'mobx-react-lite';
 import { configStore } from '../store/ConfigStore';
@@ -656,6 +656,15 @@ export const Editor2D = observer(() => {
 
   // Overlay state for adding nodes
   const [addMenuOverlay, setAddMenuOverlay] = useState<{ x: number; y: number; nodeId: string; edge: 'top' | 'bottom' | 'left' | 'right' } | null>(null);
+  const addMenuRef = useRef<HTMLDivElement>(null);
+  const [addMenuFlipped, setAddMenuFlipped] = useState(false);
+
+  // Flip the add menu below the click point when there is not enough room above it
+  useLayoutEffect(() => {
+    if (addMenuOverlay && addMenuRef.current) {
+      setAddMenuFlipped(addMenuOverlay.y - addMenuRef.current.offsetHeight - 16 < 0);
+    }
+  }, [addMenuOverlay]);
 
   useEffect(() => {
     const handleResize = () => {
@@ -1072,6 +1081,7 @@ export const Editor2D = observer(() => {
         {/* HTML Context Menu Overlay for Adding Attachments */}
         {addMenuOverlay && (
           <div
+            ref={addMenuRef}
             style={{
               position: 'absolute',
               left: addMenuOverlay.x,
@@ -1085,8 +1095,10 @@ export const Editor2D = observer(() => {
               gap: '4px',
               boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
               zIndex: 10,
-              transform: 'translate(-50%, -100%)', // Center above the click point
-              marginTop: '-16px'
+              transform: addMenuFlipped ? 'translate(-50%, 0)' : 'translate(-50%, -100%)', // Center on the click point, flipping below it when there is no room above
+              marginTop: addMenuFlipped ? '16px' : '-16px',
+              maxHeight: 'calc(100% - 32px)',
+              overflowY: 'auto'
             }}
           >
             <div style={{ fontSize: '0.8rem', color: '#a0aec0', marginBottom: '4px', textAlign: 'center', fontWeight: 'bold' }}>Add to {addMenuOverlay.edge}</div>
