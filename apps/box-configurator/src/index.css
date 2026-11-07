@@ -899,6 +899,20 @@ button.primary-btn:hover {
     right: 10px;
   }
 
+  .main-content {
+    flex-direction: column;
+  }
+
+  .editor-2d-wrapper,
+  .canvas-container {
+    min-height: 0;
+  }
+
+  .editor-2d-wrapper {
+    border-right: none;
+    border-bottom: 1px solid var(--color-border);
+  }
+
 }
 
 
