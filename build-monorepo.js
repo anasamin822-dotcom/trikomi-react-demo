@@ -111,6 +111,16 @@ if (fs.existsSync(publicDir)) {
     }
 
     const destPath = path.join(rootDist, item);
+    if (item === 'assets') {
+      // Merge public/assets into dist/assets without deleting compiled app bundles
+      try {
+        fs.cpSync(srcPath, destPath, { recursive: true });
+      } catch (err) {
+        console.warn(`⚠️ Could not merge public assets into dist/assets: ${err.message}`);
+      }
+      continue;
+    }
+
     if (fs.existsSync(destPath)) {
       fs.rmSync(destPath, { recursive: true, force: true });
     }
