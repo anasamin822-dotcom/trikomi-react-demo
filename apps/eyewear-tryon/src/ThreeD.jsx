@@ -2,6 +2,7 @@
 import _React, { useEffect, useRef } from 'react';
 import { autorun } from 'mobx';
 import * as THREE from 'three/webgpu';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import store from "./Store";
 import { ThreeViewer, viewerStore, GLTFPlugin, StatsPlugin } from '@trikomi/core';
 import { FaceMocapPlugin } from '@trikomi/core/face-mocap';
@@ -12,7 +13,7 @@ const glasses3Url = `${import.meta.env.BASE_URL}models/glasses3.glb`;
 const glasses4Url = `${import.meta.env.BASE_URL}models/glasses4.glb`;
 const glasses5Url = `${import.meta.env.BASE_URL}models/glasses5.glb`;
 const glasses6Url = `${import.meta.env.BASE_URL}models/glasses6.glb`;
-const headOccluderUrl = `${import.meta.env.BASE_URL}models/head_occluder.obj`;
+const headOccluderUrl = `${import.meta.env.BASE_URL}models/head-occluder.glb`;
 const envMapUrl = `${import.meta.env.BASE_URL}images/brown_photostudio_02.webp`;
 
 export const AVAILABLE_MODELS = [
@@ -154,8 +155,24 @@ const ThreeD = () => {
             // Ensure transparent background so video underneath is visible
             viewerStore.setBackgroundColor('transparent');
 
-            // Load face occluder via the plugin once
-            mocapPlugin.loadOccluder(headOccluderUrl);
+            // Load full 3D head occluder (with temples and ears for accurate occlusion)
+            const gltfLoader = new GLTFLoader();
+            gltfLoader.load(headOccluderUrl, (gltf) => {
+                const occluder = gltf.scene;
+                occluder.scale.set(1, 1.1, 1);
+                occluder.traverse((node) => {
+                    if (node.isMesh) {
+                        const mat = new THREE.MeshStandardMaterial();
+                        mat.colorWrite = false;
+                        mat.depthWrite = true;
+                        node.renderOrder = -1;
+                        node.material = mat;
+                    }
+                });
+                mocapPlugin.faceOccluderMesh = occluder;
+            }, undefined, (err) => {
+                console.warn("⚠️ Failed to load head occluder glb:", err);
+            });
 
             // 4. Load Models and manage switcher
             let currentModelGroup = null;
