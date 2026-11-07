@@ -123,11 +123,27 @@ if (fs.existsSync(publicDir)) {
   const items = fs.readdirSync(publicDir);
   for (const item of items) {
     if (item === 'packages') continue; // Do not copy the local SDK symlink into production build
+    const srcPath = path.join(publicDir, item);
+    // Guard against dangling or local-only absolute symlinks on CI (e.g. fabric_library)
+    try {
+      const lstat = fs.lstatSync(srcPath);
+      if (lstat.isSymbolicLink() && !fs.existsSync(srcPath)) {
+        console.warn(`⚠️ Skipping broken symlink on CI: ${item}`);
+        continue;
+      }
+    } catch {
+      continue;
+    }
+
     const destPath = path.join(rootDist, item);
     if (fs.existsSync(destPath)) {
       fs.rmSync(destPath, { recursive: true, force: true });
     }
-    fs.cpSync(path.join(publicDir, item), destPath, { recursive: true, force: true });
+    try {
+      fs.cpSync(srcPath, destPath, { recursive: true, force: true });
+    } catch (err) {
+      console.warn(`⚠️ Could not copy public asset ${item}: ${err.message}`);
+    }
   }
   console.log('✔ Copied public assets to dist/\n');
 }
