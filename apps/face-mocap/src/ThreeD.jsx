@@ -8,8 +8,47 @@ import { FaceMocapPlugin } from '@trikomi/core/face-mocap';
 const glassesUrl = import.meta.env.BASE_URL + 'models/glasses.glb';
 const raccoonUrl = import.meta.env.BASE_URL + 'models/raccoon_head_small.glb';
 const headOccluderUrl = import.meta.env.BASE_URL + 'models/head_occluder.obj';
+import { FilesetResolver, FaceLandmarker } from '@mediapipe/tasks-vision';
 
-export const mocapPlugin = new FaceMocapPlugin(import.meta.env.DEV ? '/assets/wasm' : '../assets/wasm');
+const wasmBase = `${import.meta.env.BASE_URL}assets/wasm`.replace(/\/+/g, '/').replace(':/', '://');
+const modelTaskPath = `${import.meta.env.BASE_URL}ml/face_landmarker.task`.replace(/\/+/g, '/').replace(':/', '://');
+
+export const mocapPlugin = new FaceMocapPlugin(wasmBase);
+
+mocapPlugin.initFaceLandmarker = async function() {
+    try {
+        const filesetResolver = await FilesetResolver.forVisionTasks(wasmBase);
+        let landmarker;
+        try {
+            landmarker = await FaceLandmarker.createFromOptions(filesetResolver, {
+                baseOptions: {
+                    modelAssetPath: modelTaskPath,
+                    delegate: 'GPU'
+                },
+                outputFacialTransformationMatrixes: true,
+                outputFaceBlendshapes: true,
+                runningMode: 'VIDEO',
+                numFaces: 1
+            });
+        } catch (gpuErr) {
+            console.warn('[FaceMocapPlugin] GPU delegate failed, falling back to CPU:', gpuErr);
+            landmarker = await FaceLandmarker.createFromOptions(filesetResolver, {
+                baseOptions: {
+                    modelAssetPath: modelTaskPath,
+                    delegate: 'CPU'
+                },
+                outputFacialTransformationMatrixes: true,
+                outputFaceBlendshapes: true,
+                runningMode: 'VIDEO',
+                numFaces: 1
+            });
+        }
+        this.faceLandmarker = landmarker;
+        this.isLoaded = true;
+    } catch (err) {
+        console.error('[FaceMocapPlugin] Failed to initialize FaceLandmarker:', err);
+    }
+};
 
 const ThreeD = () => {
     const mountRef = useRef(null);

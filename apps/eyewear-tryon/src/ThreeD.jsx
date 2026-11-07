@@ -24,8 +24,49 @@ export const AVAILABLE_MODELS = [
     { name: 'Hexagonal', url: glasses6Url, thumb: `${import.meta.env.BASE_URL}thumbs/glasses6.png`, scale: 0.3 }
 ];
 
-export const mocapPlugin = new FaceMocapPlugin('/assets/wasm');
+import { FilesetResolver, FaceLandmarker } from '@mediapipe/tasks-vision';
+
+const wasmBase = `${import.meta.env.BASE_URL}assets/wasm`.replace(/\/+/g, '/').replace(':/', '://');
+const modelTaskPath = `${import.meta.env.BASE_URL}ml/face_landmarker.task`.replace(/\/+/g, '/').replace(':/', '://');
+
+export const mocapPlugin = new FaceMocapPlugin(wasmBase);
 mocapPlugin.smoothStep = 0.5; // Ensure smoothStep is defined for lerping
+
+// Override initFaceLandmarker to dynamically support base URL pathing and GPU-to-CPU fallback
+mocapPlugin.initFaceLandmarker = async function() {
+    try {
+        const filesetResolver = await FilesetResolver.forVisionTasks(wasmBase);
+        let landmarker;
+        try {
+            landmarker = await FaceLandmarker.createFromOptions(filesetResolver, {
+                baseOptions: {
+                    modelAssetPath: modelTaskPath,
+                    delegate: 'GPU'
+                },
+                outputFacialTransformationMatrixes: true,
+                outputFaceBlendshapes: true,
+                runningMode: 'VIDEO',
+                numFaces: 1
+            });
+        } catch (gpuErr) {
+            console.warn('[FaceMocapPlugin] GPU delegate failed, falling back to CPU:', gpuErr);
+            landmarker = await FaceLandmarker.createFromOptions(filesetResolver, {
+                baseOptions: {
+                    modelAssetPath: modelTaskPath,
+                    delegate: 'CPU'
+                },
+                outputFacialTransformationMatrixes: true,
+                outputFaceBlendshapes: true,
+                runningMode: 'VIDEO',
+                numFaces: 1
+            });
+        }
+        this.faceLandmarker = landmarker;
+        this.isLoaded = true;
+    } catch (err) {
+        console.error('[FaceMocapPlugin] Failed to initialize FaceLandmarker:', err);
+    }
+};
 
 const ThreeD = () => {
     const mountRef = useRef(null);
