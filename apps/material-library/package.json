@@ -1,0 +1,27 @@
+{
+  "name": "@trikomi/app-material-library",
+  "description": "Trikomi Material Library — interactive PBR & fabric material showroom on spheres and shaderballs",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --port 5177",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@trikomi/core": "file:../../npm-staging/trikomi-core-1.0.6-dev.1793767197559.tgz",
+    "mobx": "^6.15.3",
+    "mobx-react-lite": "^4.1.1",
+    "react": "^19.2.6",
+    "react-dom": "^19.2.6",
+    "three": "^0.184.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^6.0.1",
+    "typescript": "~6.0.2",
+    "vite": "^8.0.16"
+  }
+}

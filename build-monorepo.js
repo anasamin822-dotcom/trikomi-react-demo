@@ -22,6 +22,11 @@ if (fs.existsSync(envPath)) {
 }
 import crypto from 'crypto';
 
+// Build command MUST use npm package unless explicitly overridden via CLI (e.g. BUILD_LOCAL_SDK=true)
+const forceLocalSdk = process.env.BUILD_LOCAL_SDK === 'true';
+process.env.USE_LOCAL_SDK = forceLocalSdk ? 'true' : 'false';
+console.log(`📦 Build Mode: Using ${forceLocalSdk ? 'Local SDK' : 'Staged NPM Package (@trikomi/core)'}\n`);
+
 const appsDir = path.resolve('apps');
 const apps = fs.readdirSync(appsDir).filter(name => fs.statSync(path.join(appsDir, name)).isDirectory());
 const rootDist = path.resolve('dist');
@@ -67,7 +72,10 @@ for (const app of apps) {
 
   // Build the app
   try {
-    execSync(`pnpm --dir apps/${app} build`, { stdio: 'inherit' });
+    execSync(`pnpm --dir apps/${app} build`, {
+      stdio: 'inherit',
+      env: { ...process.env, USE_LOCAL_SDK: process.env.USE_LOCAL_SDK }
+    });
   } catch (err) {
     console.error(`Failed to build ${app}. Skipping...`);
     continue;
@@ -115,7 +123,11 @@ if (fs.existsSync(publicDir)) {
   const items = fs.readdirSync(publicDir);
   for (const item of items) {
     if (item === 'packages') continue; // Do not copy the local SDK symlink into production build
-    fs.cpSync(path.join(publicDir, item), path.join(rootDist, item), { recursive: true, force: true });
+    const destPath = path.join(rootDist, item);
+    if (fs.existsSync(destPath)) {
+      fs.rmSync(destPath, { recursive: true, force: true });
+    }
+    fs.cpSync(path.join(publicDir, item), destPath, { recursive: true, force: true });
   }
   console.log('✔ Copied public assets to dist/\n');
 }
