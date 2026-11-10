@@ -128,7 +128,7 @@ const Dashboard = () => {
                     <span className={`badge ${tour.status === 'published' ? 'badge-published' : 'badge-draft'}`}>
                       {tour.status || 'draft'}
                     </span>
-                    <span>{tour.scenes_count || tour.scenes?.length || 0} scenes · {new Date(tour.updated_at).toLocaleDateString()}</span>
+                    <span>{tour.scenes_count || tour.scenes?.length || 0} {(tour.scenes_count || tour.scenes?.length || 0) === 1 ? 'scene' : 'scenes'} · {new Date(tour.updated_at).toLocaleDateString()}</span>
                   </div>
                 </div>
               </Link>
