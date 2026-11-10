@@ -1016,7 +1016,7 @@ textarea.input-field { resize: vertical; min-height: 60px; }
   .editor-left-sidebar,
   .editor-right-sidebar {
     position: absolute;
-    top: 0;
+    top: 44px;
     bottom: 0;
     z-index: 40;
   }
