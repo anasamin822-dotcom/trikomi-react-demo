@@ -319,7 +319,6 @@ const VirtualTour = observer(({ customConfigMode }) => {
         {virtualTourStore.currentScene && (
           <div className="viewer-scene-badge">
             <strong>{virtualTourStore.currentScene.name}</strong>
-            <small>{virtualTourStore.debugInfo}</small>
           </div>
         )}
 
