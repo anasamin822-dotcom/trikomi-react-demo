@@ -43,6 +43,51 @@ const VirtualTour = observer(({ customConfigMode }) => {
     if (!containerRef.current) return;
 
     let viewer;
+
+    // Touch controls for phones - the engine plugin only listens to mouse events
+    const container = containerRef.current;
+    container.style.touchAction = 'none';
+    let lastTouch = null;
+    let pinchDist = 0;
+    const handleTouchStart = (e) => {
+      if (!vtPluginRef.current) return;
+      vtPluginRef.current.isDragging = true;
+      if (e.touches.length === 1) {
+        lastTouch = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+        pinchDist = 0;
+      } else if (e.touches.length === 2) {
+        lastTouch = null;
+        pinchDist = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
+      }
+    };
+    const handleTouchMove = (e) => {
+      const vtPlugin = vtPluginRef.current;
+      if (!vtPlugin) return;
+      e.preventDefault();
+      if (e.touches.length === 1 && lastTouch) {
+        const dx = e.touches[0].clientX - lastTouch.x;
+        const dy = e.touches[0].clientY - lastTouch.y;
+        lastTouch = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+        vtPlugin.targetRotation.x += dy * 0.005;
+        vtPlugin.targetRotation.y += dx * 0.005;
+        vtPlugin.targetRotation.x = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, vtPlugin.targetRotation.x));
+      } else if (e.touches.length === 2 && pinchDist > 0) {
+        const dist = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
+        const cam = viewerRef.current.camera;
+        cam.fov = Math.max(25, Math.min(90, cam.fov - (dist - pinchDist) * 0.1));
+        cam.updateProjectionMatrix();
+        pinchDist = dist;
+      }
+    };
+    const handleTouchEnd = () => {
+      if (vtPluginRef.current) vtPluginRef.current.isDragging = false;
+      lastTouch = null;
+      pinchDist = 0;
+    };
+    container.addEventListener('touchstart', handleTouchStart);
+    container.addEventListener('touchmove', handleTouchMove, { passive: false });
+    container.addEventListener('touchend', handleTouchEnd);
+
     import('@trikomi/core').then(({ ThreeViewer, ViewerStore, VirtualTourPlugin, MotionBlurPlugin }) => {
       const store = new ViewerStore();
       viewer = new ThreeViewer(containerRef.current, store, {
@@ -128,6 +173,9 @@ const VirtualTour = observer(({ customConfigMode }) => {
     });
 
     return () => {
+      container.removeEventListener('touchstart', handleTouchStart);
+      container.removeEventListener('touchmove', handleTouchMove);
+      container.removeEventListener('touchend', handleTouchEnd);
       if (viewerRef.current) {
         viewerRef.current.dispose();
       }
