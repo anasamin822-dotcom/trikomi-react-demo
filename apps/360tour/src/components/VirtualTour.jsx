@@ -25,6 +25,7 @@ const VirtualTour = observer(({ customConfigMode }) => {
   const [mediaModal, setMediaModal] = useState({ show: false, content: null });
   const [engineReady, setEngineReady] = useState(false);
   const [tourStarted, setTourStarted] = useState(false);
+  const [sceneError, setSceneError] = useState('');
   const globalAudioRef = useRef(null);
 
   // Load tour on mount from API
@@ -188,6 +189,7 @@ const VirtualTour = observer(({ customConfigMode }) => {
     
     const currentScene = virtualTourStore.currentScene;
     if (!currentScene) return;
+    setSceneError('');
 
     // sync ref with current scene id
     currentSceneIdRef.current = virtualTourStore.currentSceneId;
@@ -274,7 +276,11 @@ const VirtualTour = observer(({ customConfigMode }) => {
         if (isMutedRef.current) {
           vtPlugin.setMute(true);
         }
+      }).catch(() => {
+        setSceneError('This panorama could not be loaded. Try a different image.');
       });
+    }).catch(() => {
+      setSceneError('This panorama could not be loaded. Try a different image.');
     });
 
   }, [engineReady, virtualTourStore.tourData]);
@@ -332,6 +338,16 @@ const VirtualTour = observer(({ customConfigMode }) => {
           background: '#1a1a1a', color: 'white'
         }}>
           Loading tour...
+        </div>
+      )}
+
+      {sceneError && (
+        <div style={{
+          position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)',
+          zIndex: 9999, padding: '12px 20px', borderRadius: 8, maxWidth: '80%',
+          background: 'rgba(0,0,0,0.85)', color: 'white', fontSize: '0.9rem', textAlign: 'center'
+        }}>
+          {sceneError}
         </div>
       )}
 
