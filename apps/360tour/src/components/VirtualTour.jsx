@@ -197,8 +197,15 @@ const VirtualTour = observer(({ customConfigMode }) => {
     const viewer = viewerRef.current;
     const vtPlugin = vtPluginRef.current;
 
-    import('@trikomi/core/tour').then(m => m.getImageObjectURL(virtualTourStore.tourData.id, currentScene.panorama)).then(resolvedUrl => {
-      loadEquirectangularPanorama(resolvedUrl || currentScene.panorama).then(async (sphere) => {
+    import('@trikomi/core/tour').then(m => m.getImageObjectURL(virtualTourStore.tourData.id, currentScene.panorama)).then(async resolvedUrl => {
+      const panoUrl = resolvedUrl || currentScene.panorama;
+      try {
+        await createImageBitmap(await (await fetch(panoUrl)).blob());
+      } catch {
+        setSceneError('This panorama could not be loaded. Try a different image.');
+        return;
+      }
+      loadEquirectangularPanorama(panoUrl).then(async (sphere) => {
         if (currentGroupRef.current) {
           viewer.scene.remove(currentGroupRef.current);
           
