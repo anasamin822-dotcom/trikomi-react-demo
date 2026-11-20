@@ -108,8 +108,8 @@
 /* Review changes: reversible drawer and material-finish previews. */
 .studio-stage{transition:left .55s ease,inset .55s ease;}
 .studio-intro,.studio-controls{transition:opacity .3s ease,transform .45s ease,visibility .45s;}
-.studio-drawer-toggle{position:absolute;z-index:8;left:34%;top:12%;display:flex;align-items:center;gap:7px;min-height:44px;padding:5px 12px!important;border:1px solid var(--line)!important;border-radius:24px;background:#15130fe6!important;font-size:12px!important;}
-.studio-drawer-toggle>span:first-child{font-size:25px;line-height:1;}
+.studio-drawer-toggle{position:absolute;z-index:8;left:34%;top:12%;display:flex;align-items:center;justify-content:center;width:40px;height:40px;min-height:0;padding:0!important;border:1px solid var(--line)!important;border-radius:50%;background:#15130fe6!important;font-size:12px!important;}
+.studio-drawer-toggle>span:first-child{font-size:22px;line-height:1;}
 .panel-closed .studio-stage{left:0;}
 .panel-closed .studio-intro,.panel-closed .studio-controls{opacity:0;transform:translateX(-35px);visibility:hidden;pointer-events:none;}
 .panel-closed .studio-drawer-toggle{left:3.5%;}
@@ -117,11 +117,16 @@
 .finish-orb{width:46px;height:46px;border-radius:50%;display:block;background:radial-gradient(circle at 29% 23%,#fff5d9 0%,#f7dc9a 7%,#c69742 24%,#5d3d14 42%,#211608 62%,#b38839 85%,#e5c174 95%);box-shadow:inset -5px -5px 9px #0008,inset 2px 2px 4px #fff4,0 4px 7px #0008;}
 .finish-satin{background:radial-gradient(circle at 30% 26%,#e7d5ac,#b89a63 28%,#7d633b 64%,#ba9e64);filter:contrast(.8);}
 .finish-brushed{background:repeating-linear-gradient(12deg,#ffffff13 0 1px,#00000016 1px 2px,transparent 2px 4px),radial-gradient(circle at 30% 25%,#d8c496,#a58954 37%,#6a512b 75%,#ae914e);}
-.stone-shape{width:42px;height:42px;}
-.stone-shape024{clip-path:polygon(50% 0,78% 9%,93% 26%,100% 50%,93% 74%,78% 91%,50% 100%,22% 91%,7% 74%,0 50%,7% 26%,22% 9%);}
+/* Stone cut thumbs are renders of the actual stone geometries in models/.
+   The 'shape' cut's value class is .stone-shape itself, so it carries the
+   octagonal image; .stone-original and .stone-shape024 override it. */
+.stone-shape{width:52px;height:52px;border:0;box-shadow:none;clip-path:none;background:transparent center/contain no-repeat;background-image:url('/studio/gem-octagonal.png');filter:drop-shadow(0 4px 8px rgba(0,0,0,.55));}
+.stone-original{background-image:url('/studio/gem-original.png');}
+.stone-shape024{background-image:url('/studio/gem-round.png');}
 @media(max-width:900px){
  .studio-brand{gap:2vw;font-size:2.6vw;}.studio-brand img{width:25vw;}
- .studio-drawer-toggle{left:auto;right:4%;top:14vw;min-height:36px;padding:2px 10px!important;font-size:10px!important;}
+ .studio-drawer-toggle{left:auto;right:4%;top:14vw;width:36px;height:36px;min-height:0;padding:0!important;font-size:10px!important;}
+ .studio-drawer-toggle>span:first-child{transform:rotate(-90deg);}
  .panel-closed .studio-drawer-toggle{left:auto;right:4%;}
  .panel-closed .studio-controls{position:absolute;top:110vh;}
  .panel-closed .studio-stage{height:100dvh;min-height:100dvh;left:auto;}
@@ -154,3 +159,141 @@
 }
 
 @media(max-width:900px){.studio-stage{overflow:hidden;}.studio-pedestal::after{background-size:100% auto;background-repeat:repeat-y;}}
+
+/* Premium polish pass: font pairing, contrast, glass panel, control consistency. */
+.studio-brand>span:last-child,.studio-steps button,.step-number,.studio-field h2,.studio-field>label,.studio-options button,.studio-ring-switch,.studio-ring-switch button,.studio-history button,.studio-view-options button,.studio-tools button,.studio-drawer-toggle,.studio-continue { font-family:'Space Grotesk','DM Sans',Arial,sans-serif; }
+.studio-steps button { text-transform:uppercase; letter-spacing:1.6px; font-size:12px; color:#b8b2a4; }
+.studio-steps button.active { color:var(--gold); }
+.studio-field h2,.studio-field>label { font-size:15px; font-weight:500; text-transform:uppercase; letter-spacing:1.8px; color:#e9e2d2; }
+.optional { text-transform:none; letter-spacing:.4px; color:#b5ab96; }
+.studio-options button { color:#ddd8cc; }
+.studio-options button.selected { color:#f3e3b2; background:linear-gradient(180deg,rgba(232,214,162,.16),rgba(232,214,162,.07)); box-shadow:0 0 0 1px var(--gold),0 6px 18px rgba(232,214,162,.12); }
+.studio-view-options button.selected { background:rgba(232,214,162,.12); box-shadow:0 0 0 1px var(--gold); }
+.studio-controls { background:rgba(13,12,10,.58); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px); border:1px solid var(--line); border-radius:18px; padding:22px 24px 16px; box-shadow:0 24px 60px rgba(0,0,0,.45); }
+.studio-ring-switch { font-size:13px; gap:10px; color:#c9c3b4; }
+.studio-ring-switch button { font-size:13px; min-height:38px; padding:7px 14px; border-radius:7px; color:#d9d4c8; }
+.studio-ring-switch button[aria-pressed=true] { background:rgba(232,214,162,.12); color:var(--gold); }
+.studio-history button { color:#c9c3b4; }
+.studio-continue { box-shadow:0 10px 30px rgba(210,170,100,.28),inset 0 1px 1px #ffecc8; }
+.studio-drawer-toggle { left:auto; right:calc(68% - 18px); top:calc(39.8% - 16px); }
+.panel-closed .studio-drawer-toggle { left:3.5%; right:auto; }
+@media(prefers-reduced-motion:no-preference) { .studio-options button:hover,.studio-view-options button:hover,.studio-ring-switch button:hover { box-shadow:0 0 14px rgba(232,214,162,.18); } }
+@media(max-width:1100px) and (min-width:901px) { .studio-drawer-toggle { right:calc(100% - 35.5% - 18px); } }
+@media(max-width:900px) {
+  .studio-controls { background:#080807; border:0; border-top:1px solid #27251f; border-radius:0; padding:3vw 5.6% 4vw; box-shadow:none; backdrop-filter:none; -webkit-backdrop-filter:none; }
+  .studio-steps button { font-size:2.8vw; letter-spacing:.8px; }
+  .studio-field h2,.studio-field>label { font-size:3.15vw; letter-spacing:1.2px; }
+  .studio-drawer-toggle { left:auto; right:4%; top:14vw; }
+  .studio-live-label { bottom:3vw; }
+  .studio-ring-switch { font-size:12px; }
+  .studio-ring-switch button { font-size:12px; min-height:34px; }
+}
+@media(max-width:500px) { .studio-field h2,.studio-field>label { font-size:13px; } .studio-steps button { font-size:12px; } }
+@media(max-width:900px) {
+  .studio-live-label { display:none; }
+  .studio-ring-switch { gap:6px; }
+  .studio-ring-switch button { padding:6px 10px; }
+}
+
+/* Poster direction: four-step flow, collections, warmer stage, marble-feel pedestal. */
+.studio-brand-pill { border:1px solid var(--gold); border-radius:50px; padding:8px 20px; font-size:15px; color:#f1dfaa; white-space:nowrap; }
+.studio-nav { position:absolute; left:50%; transform:translateX(-50%); }
+.studio-nav button { font-size:16px; color:#e9e4d8; min-height:44px; display:flex; align-items:center; gap:8px; }
+.studio-nav button:hover { color:var(--gold); }
+.studio-badge { background:linear-gradient(135deg,#efceaa,#c29c71); color:#0c0b08; font-size:11px; min-width:20px; height:20px; border-radius:10px; display:inline-flex; align-items:center; justify-content:center; padding:0 5px; }
+.studio-icon-btn { width:44px; height:44px; border-radius:50%; display:flex; align-items:center; justify-content:center; }
+.studio-icon-btn:hover { color:var(--gold); }
+.studio-icon-btn svg { width:22px; height:23px; }
+.studio h1 { font-size:clamp(42px,5vw,80px); line-height:.98; letter-spacing:-.3px; }
+.studio h1 em { font-family:'Cormorant Garamond','Studio Display',Georgia,serif; font-style:italic; font-weight:500; letter-spacing:0; }
+.studio-description { font-family:'Cormorant Garamond','Studio Display',Georgia,serif; font-style:italic; font-size:21px; color:#d8cfb8; max-width:420px; line-height:1.35; }
+.studio-header::after { content:''; position:absolute; left:2.35%; right:2.35%; bottom:0; height:1px; background:linear-gradient(90deg,transparent,rgba(232,214,162,.3),transparent); }
+.studio-controls { width:31%; padding:26px 28px 18px; background:rgba(12,11,9,.72); backdrop-filter:blur(18px); -webkit-backdrop-filter:blur(18px); border-radius:20px; border-color:rgba(224,211,181,.3); box-shadow:0 30px 70px rgba(0,0,0,.55); }
+.studio-controls::before { content:''; position:absolute; top:0; left:28px; right:28px; height:1px; background:linear-gradient(90deg,transparent,rgba(232,214,162,.65),transparent); }
+.studio-steps { gap:6px; }
+.studio-steps button:not(:last-child)::after { width:22px; }
+.studio-steps button.active .step-number { background:linear-gradient(135deg,#efceaa,#c29c71); color:#0c0b08; border-color:transparent; box-shadow:0 4px 14px rgba(210,170,100,.35); }
+.studio-options.materials { grid-template-columns:repeat(4,minmax(0,1fr)); }
+.studio-options.materials button { height:104px; }
+.metal-orb { width:44px; height:44px; }
+.metal-orb.white-gold { background-image:none; background:radial-gradient(circle at 30% 25%,#fffdf4 0%,#ece5cf 35%,#b9b197 68%,#efe9d6 95%); box-shadow:inset -5px -5px 9px #0007,inset 2px 2px 4px #fff5,0 4px 7px #0007; }
+.studio-options.sizes { grid-template-columns:repeat(5,minmax(0,1fr)); }
+.studio-options button { box-shadow:inset 0 1px 0 rgba(255,255,255,.05); }
+.studio-options.materials button.selected .metal-orb { box-shadow:0 0 0 2px #0b0a08,0 0 0 3.5px var(--gold); }
+.studio-review { margin:0; }
+.studio-review>div { display:flex; justify-content:space-between; gap:16px; border-bottom:1px solid var(--line); padding:9px 0; font-size:14px; }
+.studio-review dt { color:#b9af99; text-transform:none; letter-spacing:.3px; }
+.studio-review dd { margin:0; color:#f1ecdf; text-align:right; }
+.studio-history { position:absolute; left:3.5%; bottom:3%; margin:0; padding:14px 0 0; border-top:0; z-index:3; }
+.studio-history .mobile-reset { display:none; }
+.studio-tools { top:auto; bottom:24%; right:2.2%; border:1px solid var(--line); border-radius:48px; padding:10px 8px; gap:4px; background:rgba(10,10,9,.5); backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px); }
+.studio-tools button { border:0; width:56px; height:56px; background:none; }
+.studio-tools button:hover { color:var(--gold); }
+.studio-tools .studio-hd span { font-size:12px; letter-spacing:1px; border:1px solid currentColor; border-radius:4px; padding:3px 6px; }
+.studio-tools .studio-hd[aria-pressed=true] { color:var(--gold); }
+.studio-spotlight { position:absolute; inset:0; pointer-events:none; background:radial-gradient(ellipse 55% 42% at 52% 62%,rgba(255,196,110,.16),transparent 70%); }
+.studio-photograph::after { content:''; position:absolute; inset:0; pointer-events:none; background:radial-gradient(ellipse at 64% 32%,rgba(214,164,90,.22),transparent 58%),linear-gradient(rgba(28,17,7,.18),rgba(8,8,7,.12)); }
+.studio-pedestal { filter:saturate(1.15) brightness(1.06); }
+.studio-drawer-toggle { right:calc(65.5% - 18px); }
+.studio-collections ul { list-style:none; margin:0; padding:0; }
+.studio-collections li { display:flex; align-items:center; justify-content:space-between; gap:12px; border-bottom:1px solid var(--line); padding:11px 0; font-size:13px; color:#e9e4d8; line-height:1.5; }
+.studio-collections li button { color:#b9af99; padding:6px; }
+.studio-collections li button:hover { color:var(--gold); }
+.studio-collections li svg { width:16px; height:17px; }
+@media(max-width:1100px) and (min-width:901px) { .studio-controls { width:34%; } .studio-drawer-toggle { right:calc(62.5% - 18px); } }
+@media(max-width:900px) {
+  .studio-controls { width:100%; padding:3vw 5.6% 4vw; background:#080807; border:0; border-top:1px solid #27251f; border-radius:0; box-shadow:none; backdrop-filter:none; -webkit-backdrop-filter:none; }
+  .studio-controls::before { display:none; }
+  .studio-header::after { display:none; }
+  .studio-brand-pill { padding:1.2vw 2.6vw; font-size:2.5vw; }
+  .studio-nav { position:static; transform:none; margin-left:auto; }
+  .studio-nav button { font-size:2.9vw; min-height:7vw; }
+  .studio-header-actions .studio-icon-btn { display:none; }
+  .studio h1 { font-size:8.6vw; }
+  .studio-description { display:none; }
+  .studio-options.materials button { height:17vw; }
+  .metal-orb { width:8vw; height:8vw; }
+  .studio-history { position:static; margin-top:auto; padding-top:1.7vw; }
+  .studio-tools { bottom:auto; top:auto; left:4.2%; right:auto; bottom:2.9vw; flex-direction:row; border-radius:40px; padding:1.4vw 2vw; gap:.6vw; }
+  .studio-tools button { width:11.5vw; height:11.5vw; }
+  .studio-review>div { font-size:2.9vw; padding:2vw 0; }
+  .studio-spotlight { background:radial-gradient(ellipse 80% 40% at 50% 45%,rgba(255,196,110,.14),transparent 70%); }
+}
+@media(max-width:500px) { .studio-brand-pill { font-size:10px; padding:3px 10px; } .studio-nav button { font-size:11px; } }
+@media(max-width:900px) {
+  .studio-brand-pill { display:none; }
+  .studio-drawer-toggle { top:28vw; }
+}
+.panel-closed .studio-live-label { display:none; }
+@media(max-width:900px) {
+  .studio-drawer-toggle, .panel-closed .studio-drawer-toggle { top:102vw; left:auto; right:4%; transform:translateY(-50%); }
+}
+@media(min-width:901px){
+ .studio-intro{top:11.5%;}
+ .studio-controls{top:41%;max-height:calc(59dvh - 78px);overflow-y:auto;scrollbar-width:thin;scrollbar-color:#6d675c transparent;padding:20px 24px 14px;}
+ .studio-controls::-webkit-scrollbar{width:4px;}
+ .studio-controls::-webkit-scrollbar-thumb{background:#6d675c;border-radius:2px;}
+ .studio-steps{margin-bottom:10px;}
+ .step-number{width:34px;height:34px;font-size:13px;}
+ .studio-steps button{gap:8px;font-size:11px;letter-spacing:1px;}
+ .studio-steps button:not(:last-child)::after{width:12px;}
+ .studio-fields{min-height:221px;}
+ .studio-field{margin-bottom:12px;}
+ .studio-field h2,.studio-field>label{margin-bottom:6px;}
+ .studio-options.materials button,.finish-options button{height:88px;}
+ .studio-continue{min-height:46px;}
+ .studio-ring-switch{margin-top:8px;}
+ .studio-review{display:grid;grid-template-columns:1fr 1fr;gap:0 18px;}
+ .studio-review>div{padding:7px 0;font-size:13px;gap:8px;}
+ .studio-fields .review-note{margin:10px 0 0;font-size:12px;line-height:1.5;color:#b9af99;}
+}
+
+/* Marble podium under the ring. The supplied rock layer is hidden so the two
+   do not clash; the podium image tracks the ring and slides with the stage. */
+.studio-pedestal{display:none;}
+/* Same stage-coordinate trick as the supplied pedestal layer: a viewport-sized
+   image that shifts exactly as far as the ring when the panel closes. */
+.studio-podium{position:absolute;z-index:0;pointer-events:none;width:100vw;height:100dvh;left:calc(50% - 67vw);top:-10dvh;background:url('/studio/podium-full.webp') center/100% 100% no-repeat;transition:top .55s ease;}
+@media(max-width:900px){
+ .studio-podium{width:200vw;height:112.56vw;left:calc(50% - 134vw);top:calc(var(--ring-top) + var(--ring-height)/2 + min(29vw,calc(var(--ring-height)*.29)) - 90vw);}
+}

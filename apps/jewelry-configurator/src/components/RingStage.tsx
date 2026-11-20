@@ -3,8 +3,8 @@ import * as THREE from 'three/webgpu';
 import { ThreeViewer, ViewerStore, OrbitControlsPlugin, EnvironmentPlugin, GLTFPlugin, CenterModelPlugin, ExportPlugin, DiamondPlugin } from '@trikomi/core';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js';
-export type RingDesign = { metal: string; width: string; stone: string; carat: string; finish: string; engraving: string };
-export type RingController = { setView: (view: string) => void; rotate: () => void; changeRing: (index: number) => Promise<void>; exportModel: () => void; importModel: (file: File) => Promise<void>; inspect: () => object };
+export type RingDesign = { metal: string; size: string; stone: string; carat: string; finish: string; engraving: string };
+export type RingController = { setView: (view: string) => void; rotate: () => void; changeRing: (index: number) => Promise<void>; exportModel: () => void; importModel: (file: File) => Promise<void>; setHd: (enabled: boolean) => void; inspect: () => object };
 type Props = { design: RingDesign; onReady: (controller: RingController) => void; onStatus: (status: string) => void };
 // Own the plugin lifecycle in the app so asynchronous model/cut changes cannot race.
 class StudioDiamondPlugin extends DiamondPlugin { onUpdate() {} }
@@ -79,24 +79,26 @@ export function RingStage({ design, onReady, onStatus }: Props) {
   applyRef.current=()=>{
    if(!modelRef.current)return;
    const current=latest.current;
-   const colors:Record<string,string>={'Yellow gold':'#dca84d','Rose gold':'#ce8b6d','Platinum':'#dce1e8'};
+   const colors:Record<string,string>={'Yellow gold':'#dca84d','Rose gold':'#ce8b6d','Platinum':'#dce1e8','White gold':'#e9e4d2'};
    for(const mesh of metalsRef.current){for(const mat of (Array.isArray(mesh.material)?mesh.material:[mesh.material])){const metal=mat as THREE.MeshStandardMaterial;metal.color?.set(colors[current.metal] || '#dca84d');metal.metalness=1;metal.roughness=current.finish==='Satin'?.38:current.finish==='Brushed'?.58:.12;metal.needsUpdate=true;}}
-   // These are explicit visual percentage scales, not physical mm or carat claims.
-   const width=current.width==='90%'?.9:current.width==='110%'?1.1:1;
-   for(const mesh of metalsRef.current){ if(!mesh.userData.studioScale)mesh.userData.studioScale=mesh.scale.clone();mesh.scale.z=mesh.userData.studioScale.z*width; }
-   for(const mesh of gemsRef.current){const base=mesh.userData.studioScale;if(base){const scale=current.carat==='90%'?.9:current.carat==='110%'?1.1:1;mesh.scale.copy(base).multiplyScalar(scale);}}
+   // These are explicit visual scales, not physical ring sizes or carat claims.
+   const sizeFactor:Record<string,number>={'6':.94,'7':.97,'8':1,'9':1.03,'10':1.06};
+   const ringSize=sizeFactor[current.size] ?? 1;
+   for(const mesh of metalsRef.current){ if(!mesh.userData.studioScale)mesh.userData.studioScale=mesh.scale.clone();const base=mesh.userData.studioScale;mesh.scale.set(base.x*ringSize,base.y*ringSize,base.z*ringSize); }
+   for(const mesh of gemsRef.current){const base=mesh.userData.studioScale;if(base){const scale=current.carat==='90%'?.9:current.carat==='110%'?1.1:1;mesh.scale.copy(base).multiplyScalar(ringSize*scale);}}
    // Apply selected cuts to the main stone only. Side stones retain their original fit.
    const main=gemsRef.current.find(mesh=>mesh.parent?.name==='Main') || gemsRef.current[0];
    let cutChanged=false;
    if(main&&main.userData.studioCut!==current.stone){viewer.pause();cutChanged=true;main.userData.studioCut=current.stone;const source=current.stone==='Original'?main.userData.originalGeometry:shapeRef.current[current.stone];if(source&&main.userData.originalGeometry){if(main.geometry!==main.userData.originalGeometry)main.geometry.dispose();if(current.stone==='Original')main.geometry=source;else{const geometry=source.clone();geometry.computeBoundingBox();const size=geometry.boundingBox?.getSize(new THREE.Vector3());const target=main.userData.originalSize;if(size&&target){const ratio=Math.max(target.x,target.z)/Math.max(size.x,size.z);geometry.scale(ratio,ratio,ratio);}main.geometry=geometry;}}}
    if(cutChanged)refreshDiamonds(main);
    viewer.needsRender=true;
-   if(host.current) host.current.dataset.ringState=JSON.stringify({metal:current.metal,finish:current.finish,metals:metalsRef.current.length,gems:gemsRef.current.length,shapes:Object.keys(shapeRef.current),color:((metalsRef.current[0]?.material as THREE.MeshStandardMaterial)?.color)?.getHexString(),roughness:(metalsRef.current[0]?.material as THREE.MeshStandardMaterial)?.roughness,stone:current.stone,auth:viewer.authStatus,mainVertices:main?.geometry.attributes.position?.count,gemScale:main?.scale.toArray(),bandScale:metalsRef.current[0]?.scale.toArray()});
+   if(host.current) host.current.dataset.ringState=JSON.stringify({metal:current.metal,finish:current.finish,metals:metalsRef.current.length,gems:gemsRef.current.length,shapes:Object.keys(shapeRef.current),color:((metalsRef.current[0]?.material as THREE.MeshStandardMaterial)?.color)?.getHexString(),roughness:(metalsRef.current[0]?.material as THREE.MeshStandardMaterial)?.roughness,stone:current.stone,auth:viewer.authStatus,mainVertices:main?.geometry.attributes.position?.count,gemScale:main?.scale.toArray(),ringSize:current.size,bandScale:metalsRef.current[0]?.scale.toArray()});
   };
   async function load(url:string,name:string){ const myGeneration=++generation; onStatus('Loading VictorShell ring…'); ++effectGeneration;clearTimeout(effectTimer);await effectQueue;viewer.pause();restoreDiamonds(); try{const model=await viewer.getPlugin(GLTFPlugin)!.loadModel(url,name);if(disposed||myGeneration!==generation)return;scan(model);applyRef.current();refreshDiamonds();viewer.getPlugin(OrbitControlsPlugin)?.resetView();viewer.needsRender=true;onStatus('');}catch(error){if(!disposed)onStatus(`Ring could not load: ${error instanceof Error?error.message:'unknown error'}`);} }
   onReady({
    setView(view){const controls=viewer.getPlugin(OrbitControlsPlugin);if(view==='side')controls?.setView('X');else if(view==='front')controls?.setView('Z');else controls?.resetView();viewer.needsRender=true;if(host.current)host.current.dataset.camera=JSON.stringify(viewer.camera.position.toArray());},
    rotate(){store.setAutoRotate(!store.autoRotate);if(host.current)host.current.dataset.autoRotate=String(store.autoRotate);viewer.needsRender=true;},
+   setHd(enabled){store.setBloomEnabled(enabled);viewer.needsRender=true;viewer.play();},
    async changeRing(index){await load(`${import.meta.env.BASE_URL}models/${index?'ring2':'ring'}.glb`,index?'Halo Setting':'Classic Solitaire');},
    exportModel(){let plugin=viewer.getPlugin(ExportPlugin);if(!plugin){viewer.addPlugin(new ExportPlugin());plugin=viewer.getPlugin(ExportPlugin);}plugin?.exportGLTF();},
    async importModel(file){const url=URL.createObjectURL(file);try{await load(url,file.name);}finally{URL.revokeObjectURL(url);}},
